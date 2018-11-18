@@ -36,6 +36,8 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.Actor;
+import static net.runelite.api.AnimationID.DRINK_OVERLOAD;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
@@ -43,10 +45,12 @@ import net.runelite.api.InstanceTemplates;
 import net.runelite.api.NullObjectID;
 import static net.runelite.api.Perspective.SCENE_SIZE;
 import net.runelite.api.Point;
+import net.runelite.api.Player;
 import static net.runelite.api.SpriteID.TAB_QUESTS_BROWN_RAIDING_PARTY;
 import net.runelite.api.Tile;
 import net.runelite.api.VarPlayer;
 import net.runelite.api.Varbits;
+import net.runelite.api.events.AnimationChanged;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.ConfigChanged;
 import net.runelite.api.events.VarbitChanged;
@@ -263,6 +267,33 @@ public class RaidsPlugin extends Plugin
 						.runeLiteFormattedMessage(chatMessage)
 						.build());
 				}
+			}
+		}
+	}
+
+	@Subscribe
+	public void onAnimationChanged(final AnimationChanged event)
+	{
+		if (!inRaidChambers)
+		{
+			return;
+		}
+
+		if (event.getActor() instanceof Player) {
+			if(config.overloadMessage() && event.getActor().getAnimation() == DRINK_OVERLOAD)
+			{
+				Player player = (Player)event.getActor();
+				String chatMessage = new ChatMessageBuilder()
+							.append(ChatColorType.NORMAL)
+							.append("Sipped Overload: ")
+							.append(ChatColorType.HIGHLIGHT)
+							.append(player.getName())
+							.build();
+
+							chatMessageManager.queue(QueuedMessage.builder()
+							.type(ChatMessageType.CLANCHAT_INFO)
+							.runeLiteFormattedMessage(chatMessage)
+							.build());
 			}
 		}
 	}

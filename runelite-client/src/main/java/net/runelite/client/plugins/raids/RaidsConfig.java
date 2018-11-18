@@ -151,4 +151,15 @@ public interface RaidsConfig extends Config
 	{
 		return "";
 	}
+
+	@ConfigItem(
+			position = 11,
+			keyName = "overloadMessage",
+			name = "Overload Chat Message",
+			description = "Will print a message in the game chat when a party member sips an overload"
+	)
+	default boolean overloadMessage()
+	{
+		return true;
+	}
 }
